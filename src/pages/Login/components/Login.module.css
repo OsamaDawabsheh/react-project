@@ -1,0 +1,14 @@
+.eyeIcon{
+    position: absolute;
+    bottom: 0.6rem;
+    right: 0.8rem;
+}
+
+.userIcon{
+    position: absolute;
+    top: -30px;
+    left: calc(50% - 35px);
+    fill: #FFC117;
+    filter: drop-shadow(black 0px 7px 1px );
+    -webkit-filter: drop-shadow(black 0px 7px 1px );
+}

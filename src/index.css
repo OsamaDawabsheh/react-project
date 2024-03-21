@@ -1,0 +1,37 @@
+.main{
+  min-height: calc(100vh - 250px);
+}
+
+input:focus{
+  outline: 0;
+}
+
+.nav-link {
+  color: white !important;
+}
+
+.nav-link:hover {
+  color: #FFC107 !important;
+}
+
+.nav-link.active {
+  color: #FFC107 !important;
+  font-weight: 700;
+}
+
+.auth a{
+    font-size: 0.8rem;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  background-color: white;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  -o-border-radius: 50%;
+}
+
