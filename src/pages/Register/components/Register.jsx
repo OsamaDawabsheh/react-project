@@ -1,17 +1,109 @@
-import React, { useState } from "react";
-import { useEffect } from "react";
+import axios from "axios";
+import React, { useState,useEffect, useRef } from "react";
+import { object, string } from 'yup';
+import { toast,Bounce } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import * as styles from "./Register.module.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function Register() {
+
+  const fileRef = useRef(null)
+
+  const file = new File(['userImage'],
+                     'userImage.png', 
+    { type: 'image/png' });
+  
   const [user, setUser] = useState({
-    username: "",
+    userName: "",
     email: "",
     password: "",
-    userImage: [],
+    image: "",
   });
-  const [imgUrl, setImgUrl] = useState('');
   const [showPassword, setShowPassword] = useState(true);
   const [isuploading, setIsUploading] = useState(false);
+  const [errors, setErrors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate();
+
+  const dataValidation = async () => {
+    let userSchema = object({
+      userName: string().required(),
+      email: string().email(),
+      password: string().min(5),
+    });
+    try{
+      await userSchema.validate(user, await { abortEarly: false });
+      setErrors([]);
+      return true;
+    } catch (error) {
+      setErrors(error.errors);
+      return false;
+    }
+
+  }
+
+  const handleUserChange = (e) => {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  }
+
+  const handleImageChange = (e) => {
+    const { name, files } = e.target;
+    setUser({ ...user, [name]: files[0] });
+    setIsUploading(true);
+  }
+
+  const handleSubmit = async (e) => { 
+    e.preventDefault();
+    const isValid = await dataValidation();
+    if (isValid) { 
+      setIsLoading(true);
+            console.log(user);
+
+      const formData = new FormData();
+      formData.append('userName', user.userName);
+      formData.append('email', user.email);
+      formData.append('password', user.password);
+      formData.append('image', user.image);
+      
+
+      try { 
+        const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/signup`, formData)
+        console.log(data);
+        if (data.message === 'success') {
+          toast.success('the account is created successfly', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Bounce,
+          });
+          navigate('/login')
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.message, {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }
+
 
   return (
     <div
@@ -20,11 +112,9 @@ function Register() {
       <form
         className="position-relative bg-primary text-light py-5 px-3 d-flex flex-column gap-4 rounded-5 col-xl-4 col-lg-5 col-md-7 col-sm-9 col-12"
         action=""
+        onSubmit={handleSubmit}
       >
         {
-          isuploading ?
-        <img src={imgUrl} alt="user-image" className={styles.userImg} />
-        :
         <svg
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
@@ -42,32 +132,35 @@ function Register() {
         <div className="text-center">
           <h2>SignUp</h2>
         </div>
-        <div className="d-flex flex-column gap-4">
+        <div className="d-flex flex-column gap-3">
+          <ul className={ errors.length !== 0 ?'bg-danger py-2 m-0 fw-bold rounded-5':'d-none'}>
+            {
+              errors.map((error,index) => 
+                <li key={index}>{error}</li>
+            )
+          }
+          </ul>
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="username" className="ms-2 fw-bold">
-              Username
+            <label htmlFor="userName" className="ms-2 fw-bold">
+              userName
             </label>
             <input
-              value={user.username}
-              onChange={(e) =>
-                setUser({ ...user, [e.target.name]: e.target.value })
-              }
+              value={user.userName}
+              onChange={handleUserChange}
               type="text"
-              name="username"
-              id="username"
+              name="userName"
+              id="userName"
               className="py-2 px-3 rounded-5 border-0"
-              placeholder="Enter username"
+              placeholder="Enter userName"
             />
-          </div>
+          </div>          
           <div className="d-flex flex-column gap-2">
             <label htmlFor="email" className="ms-2 fw-bold">
               Email
             </label>
             <input
               value={user.email}
-              onChange={(e) =>
-                setUser({ ...user, [e.target.name]: e.target.value })
-              }
+              onChange={handleUserChange}
               type="email"
               name="email"
               id="email"
@@ -82,9 +175,7 @@ function Register() {
             <input
               type={showPassword ? "password" : "text"}
               value={user.password}
-              onChange={(e) =>
-                setUser({ ...user, [e.target.name]: e.target.value })
-              }
+              onChange={handleUserChange}
               name="password"
               id="password"
               className="py-2 px-3 rounded-5 border-0"
@@ -120,25 +211,16 @@ function Register() {
           </div>
           <div className="d-flex flex-column gap-2">
             <div
-              className={`d-flex justify-content-center align-items-center gap-3 p-2 ${styles.uploadFile}`}
-              onClick={() => document.querySelector('#userImage').click()}
+              className={`d-flex justify-content-center align-items-center gap-3 p-2  ${styles.uploadFile}`}
+              onClick={()=>fileRef.current.click()}
             >
               <input
                 type="file"
-                name="userImage"
-                id="userImage"
+                name="image"
+                id="image"
+                ref={fileRef}
                 className="d-none"
-                onChange={(e) => {
-                  setUser({
-                    ...user,
-                    [e.target.name]: e.target.files[0].name,
-                  });
-                  setImgUrl(
-                    URL.createObjectURL(e.target.files[0]),
-                  )
-                  setIsUploading(true);
-                }
-                }
+                onChange={handleImageChange} 
               />
               <svg
                 version="1.1"
@@ -151,16 +233,21 @@ function Register() {
                 <title></title>
                 <path d="M15 16l-3.25 3.25-0.75-0.75 4.5-4.5 4.5 4.5-0.75 0.75-3.25-3.25v11h-1v-11zM14 21h-6.997c-2.205 0-4.003-1.791-4.003-4 0-1.895 1.325-3.488 3.101-3.898v0c-0.066-0.357-0.101-0.726-0.101-1.102 0-3.314 2.686-6 6-6 2.615 0 4.84 1.673 5.661 4.008 0.774-0.63 1.762-1.008 2.839-1.008 2.358 0 4.293 1.814 4.484 4.123v0c1.73 0.44 3.016 2.009 3.016 3.877 0 2.205-1.792 4-4.003 4h-6.997v1h7.001c2.761 0 4.999-2.244 4.999-5 0-2.096-1.287-3.892-3.117-4.634v0c-0.523-2.493-2.734-4.366-5.383-4.366-0.863 0-1.679 0.199-2.406 0.553-1.203-2.121-3.481-3.553-6.094-3.553-3.866 0-7 3.134-7 7 0 0.138 0.004 0.275 0.012 0.412v0c-1.772 0.77-3.012 2.538-3.012 4.588 0 2.761 2.232 5 4.999 5h7.001v-1z"></path>
               </svg>
-              <h6 className="user-select-none">{ isuploading ? user.userImage : "upload your image"}</h6>
+              <h6 className="user-select-none text-truncate">{ isuploading ? user.image.name : "upload your image"}</h6>
             </div>
           </div>
         </div>
 
-        <button
-          type="submit"
-          className="border-0 rounded-5 py-2 bg-warning fw-bold"
-        >
-          Sign in
+        <button type="submit" className='border-0 rounded-5 py-2 bg-warning fw-bold' disabled={isLoading ?? 'disabled'}>
+
+          {
+              isLoading?
+                <div className="spinner-border" role="status">
+              </div>
+              :'Sign Up'
+  }
+
+          
         </button>
       </form>
     </div>

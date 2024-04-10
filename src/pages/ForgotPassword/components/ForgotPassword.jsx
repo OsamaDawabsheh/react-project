@@ -3,12 +3,13 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { object, string } from "yup";
 import { toast, Bounce } from "react-toastify";
-import * as styles from "./Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
+import * as styles from "./ForgotPassword.module.css";
 
-function Login() {
+function ForgotPassword() {
   const [user, setUser] = useState({
-    email: "",
+    email: localStorage.getItem('email'),
+    code: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(true);
@@ -18,8 +19,8 @@ function Login() {
 
   const dataValidation = async () => {
     let userSchema = object({
-      email: string().email().required(),
-      password: string().required(),
+      code: string().required(),
+      password: string().required().min(5),
     });
     try {
       await userSchema.validate(user, await { abortEarly: false });
@@ -43,13 +44,13 @@ function Login() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/signin`,
+        const { data } = await axios.patch(
+          `${import.meta.env.VITE_API_URL}/auth/forgotPassword`,
           user
         );
+        console.log(data);
         if (data.message === "success") {
-          localStorage.setItem("userToken", data.token);
-          toast.success("you entered successfly", {
+          toast.success("the password changed successfly", {
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: false,
@@ -60,10 +61,13 @@ function Login() {
             theme: "light",
             transition: Bounce,
           });
-          navigate("/");
+          localStorage.removeItem("email");
+          localStorage.removeItem("changePassword");
+          navigate("/login");
         }
       } catch (error) {
-        toast.error("incorrect email or password", {
+        console.log(error);
+        toast.error(error.response.data.message, {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -80,14 +84,10 @@ function Login() {
     }
   };
 
-  const sendCode = () => {
-    localStorage.setItem('changePassword', true);
-    navigate("/sendCode");
-  }
 
   return (
     <div
-      className={`container row m-auto justify-content-center align-items-center h-100`}
+      className={`container row mx-auto justify-content-center align-items-center h-100 ${styles.yMargin}`}
     >
       <form
         className="position-relative bg-primary text-light py-5 px-3 d-flex flex-column gap-5 rounded-5 col-xl-4 col-lg-5 col-md-7 col-sm-9 col-12"
@@ -107,7 +107,7 @@ function Login() {
         </svg>
 
         <div className="text-center">
-          <h2>Login</h2>
+          <h2>Change Password</h2>
         </div>
         <div className="d-flex flex-column gap-4">
           <ul
@@ -122,22 +122,22 @@ function Login() {
             ))}
           </ul>
           <div className="d-flex flex-column gap-2">
-            <label htmlFor="email" className="ms-2 fw-bold">
-              Email
+            <label htmlFor="code" className="ms-2 fw-bold">
+              Code
             </label>
             <input
-              value={user.email}
+              value={user.code}
               onChange={handleUserChange}
-              type="email"
-              name="email"
-              id="email"
+              type="text"
+              name="code"
+              id="code"
               className="py-2 px-3 rounded-5 border-0"
-              placeholder="Enter Email"
+              placeholder="Enter Code"
             />
           </div>
           <div className="d-flex flex-column gap-2 position-relative">
             <label htmlFor="password" className="ms-2 fw-bold">
-              Password
+              New Password
             </label>
             <div className="position-relative">
             <input
@@ -147,7 +147,7 @@ function Login() {
               name="password"
               id="password"
               className="py-2 px-3 rounded-5 border-0 w-100"
-              placeholder="Enter Password"
+              placeholder="Enter New Password"
             />
             {showPassword ? (
               <svg
@@ -177,7 +177,6 @@ function Login() {
               </svg>
               )}
               </div>
-          <Link className={`text-light text-center fw-bold ${styles.forgot}`} onClick={sendCode}>Forgot Password</Link>
           </div>
         </div>
         <button
@@ -188,7 +187,7 @@ function Login() {
           {isLoading ? (
             <div className="spinner-border" role="status"></div>
           ) : (
-            "Sign In"
+            "Send"
           )}{" "}
         </button>
       </form>
@@ -196,4 +195,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

@@ -1,0 +1,41 @@
+
+
+.cartIcon{
+    position: absolute;
+    top: -30px;
+    left: calc(50% - 45px);
+    fill: #FFC117;
+    filter: drop-shadow(black 0px 4px 1px );
+    -webkit-filter: drop-shadow(black 0px 4px 1px );
+}
+
+.price{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 12px;
+}
+
+.quantity{
+    position: absolute;
+    bottom: 5px;
+    right: 5px; 
+    font-size: 12px;
+}
+
+.swiperExtensions{
+    --swiper-navigation-sides-offset: 10px;
+    --swiper-navigation-size: 20px;
+    --swiper-navigation-bg: red;;
+    --swiper-wrapper: center
+}
+
+
+@media only screen and (max-width: 768px){
+    .swiperExtensions{
+        height: 100% !important;
+    }
+}
+
+
+

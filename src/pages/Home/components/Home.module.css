@@ -9,14 +9,8 @@
     --swiper-navigation-bg: red;;
 }
 
-.swiperSlider{
-    width: 85%;
-}
 
 .errorIcon{
-    fill: danger;
+    fill: #dc3545;
 }
 
-.productCard{
-    
-}

@@ -4,7 +4,7 @@
 }
 
 .swiperExtensions{
-    --swiper-navigation-sides-offset: 10px;
+    --swiper-navigation-sides-offset: 20px;
     --swiper-navigation-size: 20px;
     --swiper-navigation-bg: red;;
 }
@@ -17,6 +17,13 @@
     fill: danger;
 }
 
-.productCard{
-    
+
+.productDetails{
+    box-shadow: 0px 5px 10px 10px black;
+}
+
+.productDescription{
+    padding: 0 10px;
+    overflow-y: auto ;
+    height: 150px;
 }
