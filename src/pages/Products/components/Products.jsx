@@ -69,67 +69,68 @@ function Products() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="d-flex gap-3 flex-wrap align-items-center justify-content-between my-5 py-3 bg-primary text-light py-2 px-4">
-            <form
-                  action=""
-                  onSubmit={submitFilter}
-              className={`w-100 d-flex flex-wrap gap-3 justify-content-between align-items-center `}
-            >
-                  <div className="d-flex flex-wrap gap-3">
-                                 <div className="d-flex align-items-center gap-2">
-                <label htmlFor="sort">Sort By</label>
-                <select
-                  value={filter.sort}
-                  onChange={handleFilter}
-                  name="sort"
-                  id="sort"
-                  className="p-2 px-3 rounded-5"
-                >
-                  <option value="">default</option>
-                  <option value="price">price</option>
-                  <option value="-price">-price</option>
-                  <option value="name">name</option>
-                  <option value="-name">-name</option>
-                  <option value="discount">discount</option>
-                  <option value="-discount">-discount</option>
-                </select>
-              </div>
-                <input
-                      type="number"
-                      name="minPrice"
-                  placeholder="min price"
-                  className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
-                  value={filter.minPrice}
-                  onChange={handleFilter}
-                />
-                <input
-                      type="number"
-                                            name="maxPrice"
+        products ?
+          <>
+            <div className="d-flex gap-3 flex-wrap align-items-center justify-content-between my-5 py-3 bg-primary text-light py-2 px-4">
+              <form
+                action=""
+                onSubmit={submitFilter}
+                className={`w-100 d-flex flex-wrap gap-3 justify-content-between align-items-center `}
+              >
+                <div className="d-flex flex-wrap gap-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <label htmlFor="sort">Sort By</label>
+                    <select
+                      value={filter.sort}
+                      onChange={handleFilter}
+                      name="sort"
+                      id="sort"
+                      className="p-2 px-3 rounded-5"
+                    >
+                      <option value="">default</option>
+                      <option value="price">price</option>
+                      <option value="-price">-price</option>
+                      <option value="name">name</option>
+                      <option value="-name">-name</option>
+                      <option value="discount">discount</option>
+                      <option value="-discount">-discount</option>
+                    </select>
+                  </div>
+                  <input
+                    type="number"
+                    name="minPrice"
+                    placeholder="min price"
+                    className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
+                    value={filter.minPrice}
+                    onChange={handleFilter}
+                  />
+                  <input
+                    type="number"
+                    name="maxPrice"
 
-                  placeholder="max price"
-                  className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
-                  value={filter.maxPrice}
-                  onChange={handleFilter}
-                />
-              <input
-                      type="search"
-                      name="search"
-                placeholder="Search"
-                className={`px-3 py-2 border-0 rounded-5`}
-                value={filter.search}
-                onChange={handleFilter}
-              />
-              </div>
-              <button type="submit" className={`btn btn-warning rounded-5`}>
-                Filter
-              </button>
-            </form>
-          </div>
+                    placeholder="max price"
+                    className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
+                    value={filter.maxPrice}
+                    onChange={handleFilter}
+                  />
+                  <input
+                    type="search"
+                    name="search"
+                    placeholder="Search"
+                    className={`px-3 py-2 border-0 rounded-5`}
+                    value={filter.search}
+                    onChange={handleFilter}
+                  />
+                </div>
+                <button type="submit" className={`btn btn-warning rounded-5`}>
+                  Filter
+                </button>
+              </form>
+            </div>
 
-          <div className="row g-4 ">
-            {products
-              ? products.map((product) => (
+            <div className="row g-4 ">
+              {
+                products.map((product) => (
                   <div
                     className="col-lg-3 col-md-4 col-sm-6 col-12"
                     key={product._id}
@@ -153,57 +154,61 @@ function Products() {
                     </div>
                   </div>
                 ))
-              : "No products"}
-            {numberOfPages > 1 ? (
-              <div>
-                <ul className="pagination d-flex justify-content-center mt-4">
-                  <li className="page-item">
-                    <button
-                      className={"page-link " + (page === 1 ? "disabled" : "")}
-                      onClick={() => {
-                        setPage(page - 1);
-                      }}
-                    >
-                      Previous
-                    </button>
-                  </li>
-                  {[
-                    [...Array(numberOfPages)].map((e, i) => (
-                      <li key={i} className="page-item">
-                        <button
-                          className={
-                            "page-link" + (page == i + 1 ? " active" : "")
-                          }
-                          onClick={() => {
-                            setPage(i + 1);
-                          }}
-                        >
-                          {i + 1}
-                        </button>
-                      </li>
-                    )),
-                  ]}
+              }
+              {numberOfPages > 1 ? (
+                <div>
+                  <ul className="pagination d-flex justify-content-center mt-4">
+                    <li className="page-item">
+                      <Link
+                        className={"page-link " + (page === 1 ? "disabled" : "")}
+                        onClick={() => {
+                          setPage(page - 1);
+                            }}
+                            to={`?page=${page - 1}`}
+                      >
+                        Previous
+                      </Link>
+                    </li>
+                    {[
+                      [...Array(numberOfPages)].map((e, i) => (
+                        <li key={i} className="page-item">
+                          <Link
+                            className={
+                              "page-link" + (page == i + 1 ? " active" : "")
+                            }
+                            onClick={() => {
+                              setPage(i + 1);
+                            }}
+                            to={`?page=${i+1}`}
+                          >
+                            {i + 1}
+                          </Link>
+                        </li>
+                      )),
+                    ]}
 
-                  <li className="page-item">
-                    <button
-                      className={
-                        "page-link " +
-                        (page === numberOfPages ? "disabled" : "")
-                      }
-                      onClick={() => {
-                        setPage(page + 1);
-                      }}
-                    >
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-        </>
+                    <li className="page-item">
+                      <Link
+                        className={
+                          "page-link " +
+                          (page === numberOfPages ? "disabled" : "")
+                        }
+                        onClick={() => {
+                          setPage(page + 1);
+                            }}
+                            to={`?page=${page + 1}`}
+                      >
+                        Next
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              ) : (
+                ""
+              )}
+            </div>
+          </>
+          : <div className="main d-flex align-items-center justify-content-center"><h3 className="text-secondary">No Products</h3></div>
       )}
     </div>
   );

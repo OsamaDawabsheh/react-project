@@ -20,7 +20,7 @@ function Navbar() {
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary mb-5">
         <div className="container d-flex align-items-baseline">
           <NavLink className="navbar-brand text-warning fw-bold me-5" to="/">
-            Navbar
+            OSAMA
           </NavLink>
           <button
             className="navbar-toggler border border-light"
