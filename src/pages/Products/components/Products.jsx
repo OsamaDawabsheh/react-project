@@ -1,11 +1,10 @@
-import React, {  useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import * as styles from "./Products.module.css";
 import { Link, NavLink } from "react-router-dom";
 import UseProducts from "../../../hooks/UseProducts";
 
 function Products() {
-
   const [page, setPage] = useState(1);
 
   const limit = 4;
@@ -17,7 +16,14 @@ function Products() {
     maxPrice: "",
   });
 
-  const { products, isLoading, errors, numberOfPages } = UseProducts(filter.sort , filter.minPrice, filter.maxPrice, filter.serach , page , limit);
+  const { products, isLoading, errors, numberOfPages } = UseProducts(
+    filter.sort,
+    filter.minPrice,
+    filter.maxPrice,
+    filter.serach,
+    page,
+    limit
+  );
 
   const handleFilter = (e) => {
     const { name, value } = e.target;
@@ -27,7 +33,7 @@ function Products() {
   const submitFilter = async (e) => {
     e.preventDefault();
     console.log(filter);
-    };
+  };
 
   return (
     <div className="container">
@@ -69,102 +75,100 @@ function Products() {
           </div>
         </div>
       ) : (
-        products ?
-          <>
-            <div className="d-flex gap-3 flex-wrap align-items-center justify-content-between my-5 py-3 bg-primary text-light py-2 px-4">
-              <form
-                action=""
-                onSubmit={submitFilter}
-                className={`w-100 d-flex flex-wrap gap-3 justify-content-between align-items-center `}
-              >
-                <div className="d-flex flex-wrap gap-3">
-                  <div className="d-flex align-items-center gap-2">
-                    <label htmlFor="sort">Sort By</label>
-                    <select
-                      value={filter.sort}
-                      onChange={handleFilter}
-                      name="sort"
-                      id="sort"
-                      className="p-2 px-3 rounded-5"
-                    >
-                      <option value="">default</option>
-                      <option value="price">price</option>
-                      <option value="-price">-price</option>
-                      <option value="name">name</option>
-                      <option value="-name">-name</option>
-                      <option value="discount">discount</option>
-                      <option value="-discount">-discount</option>
-                    </select>
-                  </div>
-                  <input
-                    type="number"
-                    name="minPrice"
-                    placeholder="min price"
-                    className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
-                    value={filter.minPrice}
+        <>
+          <div className="d-flex gap-3 flex-wrap align-items-center justify-content-between my-5 py-3 bg-primary text-light py-2 px-4">
+            <form
+              action=""
+              onSubmit={submitFilter}
+              className={`w-100 d-flex flex-wrap gap-3 justify-content-between align-items-center `}
+            >
+              <div className="d-flex flex-wrap gap-3">
+                <div className="d-flex align-items-center gap-2">
+                  <label htmlFor="sort">Sort By</label>
+                  <select
+                    value={filter.sort}
                     onChange={handleFilter}
-                  />
-                  <input
-                    type="number"
-                    name="maxPrice"
-
-                    placeholder="max price"
-                    className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
-                    value={filter.maxPrice}
-                    onChange={handleFilter}
-                  />
-                  <input
-                    type="search"
-                    name="search"
-                    placeholder="Search"
-                    className={`px-3 py-2 border-0 rounded-5`}
-                    value={filter.search}
-                    onChange={handleFilter}
-                  />
-                </div>
-                <button type="submit" className={`btn btn-warning rounded-5`}>
-                  Filter
-                </button>
-              </form>
-            </div>
-
-            <div className="row g-4 ">
-              {
-                products.map((product) => (
-                  <div
-                    className="col-lg-3 col-md-4 col-sm-6 col-12"
-                    key={product._id}
+                    name="sort"
+                    id="sort"
+                    className="p-2 px-3 rounded-5"
                   >
-                    <div
-                      className={`card h-100 d-flex align-items-center ${styles.productCard}`}
+                    <option value="">default</option>
+                    <option value="price">price</option>
+                    <option value="-price">-price</option>
+                    <option value="name">name</option>
+                    <option value="-name">-name</option>
+                    <option value="discount">discount</option>
+                    <option value="-discount">-discount</option>
+                  </select>
+                </div>
+                <input
+                  type="number"
+                  name="minPrice"
+                  placeholder="min price"
+                  className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
+                  value={filter.minPrice}
+                  onChange={handleFilter}
+                />
+                <input
+                  type="number"
+                  name="maxPrice"
+                  placeholder="max price"
+                  className={`px-3 py-2 rounded-5 border-0  ${styles.price}`}
+                  value={filter.maxPrice}
+                  onChange={handleFilter}
+                />
+                <input
+                  type="search"
+                  name="search"
+                  placeholder="Search"
+                  className={`px-3 py-2 border-0 rounded-5`}
+                  value={filter.search}
+                  onChange={handleFilter}
+                />
+              </div>
+              <button type="submit" className={`btn btn-warning rounded-5`}>
+                Filter
+              </button>
+            </form>
+          </div>
+          {products.length ? (
+            <div className="row g-4 ">
+              {products.map((product) => (
+                <div
+                  className="col-lg-3 col-md-4 col-sm-6 col-12"
+                  key={product._id}
+                >
+                  <div
+                    className={`card h-100 d-flex align-items-center ${styles.productCard}`}
+                  >
+                    <Link
+                      className="w-100 h-100"
+                      to={`/products/${product._id}`}
                     >
-                      <Link
-                        className="w-100 h-100"
-                        to={`/products/${product._id}`}
-                      >
-                        <img
-                          className="card-img-top h-100 object-fit-cover "
-                          src={product.mainImage.secure_url}
-                          alt="product image"
-                        />
-                      </Link>
-                      <div className="card-body w-100 text-center d-flex flex-column gap-3">
-                        <h5 className="card-title ">{product.name}</h5>
-                      </div>
+                      <img
+                        className="card-img-top h-100 object-fit-cover "
+                        src={product.mainImage.secure_url}
+                        alt="product image"
+                      />
+                    </Link>
+                    <div className="card-body w-100 text-center d-flex flex-column gap-3">
+                      <h5 className="card-title ">{product.name}</h5>
                     </div>
                   </div>
-                ))
-              }
+                </div>
+              ))}
               {numberOfPages > 1 ? (
                 <div>
                   <ul className="pagination d-flex justify-content-center mt-4">
                     <li className="page-item">
                       <Link
-                        className={"page-link " + (page === 1 ? "disabled" : "")}
+                        className={
+                          "page-link " + (page === 1 ? "disabled" : "")
+                        }
                         onClick={() => {
                           setPage(page - 1);
-                            }}
-                            to={`?page=${page - 1}`}
+                        }}
+                        to={`?page=${page - 1}`}
                       >
                         Previous
                       </Link>
@@ -179,7 +183,7 @@ function Products() {
                             onClick={() => {
                               setPage(i + 1);
                             }}
-                            to={`?page=${i+1}`}
+                            to={`?page=${i + 1}`}
                           >
                             {i + 1}
                           </Link>
@@ -195,8 +199,8 @@ function Products() {
                         }
                         onClick={() => {
                           setPage(page + 1);
-                            }}
-                            to={`?page=${page + 1}`}
+                        }}
+                        to={`?page=${page + 1}`}
                       >
                         Next
                       </Link>
@@ -207,8 +211,12 @@ function Products() {
                 ""
               )}
             </div>
-          </>
-          : <div className="main d-flex align-items-center justify-content-center"><h3 className="text-secondary">No Products</h3></div>
+          ) : (
+            <div className="main d-flex align-items-center justify-content-center">
+              <h3 className="text-secondary">No Products</h3>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
