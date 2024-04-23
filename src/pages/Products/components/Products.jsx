@@ -16,7 +16,7 @@ function Products() {
     maxPrice: "",
   });
 
-  const { products, isLoading, errors, numberOfPages } = UseProducts(
+  const { products, isLoading, errors, numberOfPages} = UseProducts(
     filter.sort,
     filter.minPrice,
     filter.maxPrice,

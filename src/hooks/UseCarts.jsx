@@ -2,14 +2,17 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
 
-function UseCarts(count = 0) {
+function UseCarts() {
       const [errors, setErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [products, setProducts] = useState([]);
-      const token = localStorage.getItem("userToken");
+  const token = localStorage.getItem("userToken");
+
 
      const getProducts = async () => {
-    setIsLoading(true);
+       setIsLoading(true);
+             {console.log('os')}
+
     try {
       const { data } = await axios.get(
         `${import.meta.env.VITE_API_URL}/cart`,
@@ -19,7 +22,9 @@ function UseCarts(count = 0) {
           },
         }
       );
-        setProducts(data.products);
+
+      setProducts(data.products);
+
     } catch (error) {
       setErrors(true);
     } finally {
@@ -28,11 +33,10 @@ function UseCarts(count = 0) {
     };
     
       useEffect(() => {
-    getProducts();
-  }, [products.length]);
-
-
-  return {products , isLoading , errors , token}
+        getProducts();
+      }, [products.length]);
+  
+  return {products , isLoading , errors , token , getProducts}
 
 }
 

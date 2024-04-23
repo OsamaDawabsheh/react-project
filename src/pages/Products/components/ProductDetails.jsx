@@ -14,6 +14,8 @@ import { object, string, number } from "yup";
 import { toast, Bounce } from "react-toastify";
 import { useContext } from "react";
 import UseCarts from "../../../hooks/UseCarts";
+import { CartContext } from "../../../context/Cart";
+
 
 function ProductDetails() {
   const [errors, setErrors] = useState(false);
@@ -28,6 +30,8 @@ function ProductDetails() {
   });
   const token = localStorage.getItem('userToken');
   const navigate = useNavigate();
+
+  const {count , updateCount} = useContext(CartContext);
 
 
   const { id } = useParams();
@@ -153,6 +157,8 @@ function ProductDetails() {
             theme: "light",
             transition: Bounce,
           });
+          updateCount(count + 1);
+
         }
       } catch (error) {
               toast.error(error.response.data.message, {

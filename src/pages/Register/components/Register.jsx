@@ -5,14 +5,13 @@ import { toast,Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as styles from "./Register.module.css";
 import { Navigate, useNavigate } from "react-router-dom";
+import userImage from "../../../../public/userImage.png"
 
 function Register() {
 
   const fileRef = useRef(null)
 
-  const file = new File(['userImage'],
-                     'userImage.png', 
-    { type: 'image/png' });
+
   
   const [user, setUser] = useState({
     userName: "",
@@ -59,13 +58,24 @@ function Register() {
     const isValid = await dataValidation();
     if (isValid) { 
       setIsLoading(true);
-            console.log(user);
+      console.log(user);
+      
+      // default uploaded image 
+  const response = await fetch(userImage);
+      const blob = await response.blob();
+            const file = new File([blob], 'userImage.png', { type: blob.type });
+
+
 
       const formData = new FormData();
       formData.append('userName', user.userName);
       formData.append('email', user.email);
       formData.append('password', user.password);
-      formData.append('image', user.image);
+      user.image ? 
+        formData.append('image', user.image)
+        :
+        formData.append('image', file);
+
       
 
       try { 

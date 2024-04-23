@@ -7,8 +7,7 @@ import * as styles from "./Navbar.module.css";
 function Navbar() {
   const token = localStorage.getItem("userToken");
   const navigate = useNavigate();
-  const count = useContext(CartContext);
-
+  const {count} = useContext(CartContext);
 
   const logout = () => {
     localStorage.removeItem("userToken");
@@ -17,7 +16,7 @@ function Navbar() {
 
   return (
     <>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary mb-5">
+      <nav className="navbar navbar-expand-lg sticky-top navbar-dark bg-primary mb-5">
         <div className="container d-flex align-items-baseline">
           <NavLink className="navbar-brand text-warning fw-bold me-5" to="/">
             OSAMA

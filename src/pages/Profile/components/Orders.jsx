@@ -60,7 +60,7 @@ function Orders() {
       </div>
                   </div>
                   :
-      products ? (
+      products.length ? (
         <table className="table table-bordered border-primary border-5  table-hover text-center">
           <thead>
             <tr>
@@ -99,7 +99,7 @@ function Orders() {
           </tbody>
         </table>
       ) : (
-        "No products"
+        <div className="d-flex justify-content-center"><h3 className="text-secondary">No Products</h3></div>
       )}
     </div>
   );

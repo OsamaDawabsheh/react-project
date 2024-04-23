@@ -5,13 +5,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast, Bounce } from "react-toastify";
 import UseCarts from "../../../hooks/UseCarts";
 import * as styles from "./Carts.module.css";
+import { CartContext } from "../../../context/Cart";
+
 
 function Carts() {
   const [isLoadingQuantity, setIsLoadingQuantity] = useState(false);
   const [isClearing, setIsClearinging] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [cartProducts, setCartProducts] = useState({});
 
-  const { products, isLoading, errors, token } = UseCarts();
+  const { products, isLoading, errors, token, getProducts} = UseCarts();
+    const {count , updateCount} = useContext(CartContext);
+
 
   const increaseQuantity = async (id) => {
     setIsLoadingQuantity(true);
@@ -37,7 +42,10 @@ function Carts() {
           theme: "light",
           transition: Bounce,
         });
-        console.log(data);
+        const result = data.cart.products;
+                  setCartProducts({
+                   result
+        })
       }
     } catch (error) {
       toast.error("error when trying update product's count", {
@@ -53,6 +61,8 @@ function Carts() {
       });
     } finally {
       setIsLoadingQuantity(false);
+
+
     }
   };
 
@@ -80,7 +90,10 @@ function Carts() {
           theme: "light",
           transition: Bounce,
         });
-        console.log(data);
+                const result = data.cart.products;
+                  setCartProducts({
+                   result
+        })
       }
     } catch (error) {
       toast.error(error.response.data.message, {
@@ -123,6 +136,10 @@ function Carts() {
           theme: "light",
           transition: Bounce,
         });
+        updateCount(count - 1);
+        getProducts();
+
+
       }
     } catch (error) {
       toast.error("error when trying remove product", {
@@ -165,6 +182,10 @@ function Carts() {
           theme: "light",
           transition: Bounce,
         });
+        updateCount(0);
+        getProducts();
+
+
       }
     } catch (error) {
       toast.error(error.response.data.message, {
@@ -186,7 +207,6 @@ function Carts() {
   return (
     <div className="container main d-flex flex-column gap-3">
       <h1 className="text-center">Cart</h1>
-
       {isLoading ? (
         <div
           className={
@@ -220,7 +240,7 @@ function Carts() {
           </div>
         </div>
       ) : products.length ? (
-        <>
+            <>
           <div className="d-flex justify-content-between gap-3">
             <button
               className="border border-0 text-light fw-bold bg-danger px-3 py-2 rounded-5"
@@ -311,7 +331,7 @@ function Carts() {
                         "-"
                       )}{" "}
                     </button>
-                    <span className="mx-2">{product.quantity}</span>
+                    <span className="mx-2">{ cartProducts.result  && (cartProducts.result.filter((res) => product.productId === res.productId)) ? cartProducts.result.filter((res) => product.productId === res.productId)[0].quantity :  product.quantity}</span>
                     <button
                       type="submit"
                       className="border-0 rounded-5 px-2 bg-warning fw-bold"
@@ -330,10 +350,10 @@ function Carts() {
                     </button>
                   </td>
                   <td className="col-2 align-middle">
-                    {product.details.price}$
+                    {product.details.finalPrice}$
                   </td>
                   <td className="col-2 align-middle">
-                    {product.quantity * product.details.price}$
+                    {cartProducts.result  && (cartProducts.result.filter((res) => product.productId === res.productId)) ? cartProducts.result.filter((res) => product.productId === res.productId)[0].quantity * product.details.finalPrice : product.quantity * product.details.finalPrice}$
                   </td>
                 </tr>
               ))}
