@@ -1,7 +1,7 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Link, NavLink, useParams } from 'react-router-dom';
-import * as styles from './CategoryDetails.module.css'
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import * as styles from './CategoryDetails.module.css';
 
 function CategoryDetails() {
     
@@ -13,7 +13,7 @@ function CategoryDetails() {
 const getProducts = async () => {
     setIsLoading(true);
     try { 
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/products/category/${id}`);
+      const { data } = await axios.get(`/products/category/${id}`);
         setProducts(data.products);
         console.log(data);
     }

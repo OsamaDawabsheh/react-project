@@ -1,11 +1,11 @@
 import axios from "axios";
-import React, { useState,useEffect, useRef } from "react";
-import { object, string } from 'yup';
-import { toast,Bounce } from 'react-toastify';
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { object, string } from 'yup';
+import userImage from "../../../assets/userImage.png";
 import * as styles from "./Register.module.css";
-import { Navigate, useNavigate } from "react-router-dom";
-import userImage from "../../../assets/userImage.png"
 
 function Register() {
 
@@ -79,7 +79,7 @@ function Register() {
       
 
       try { 
-        const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/signup`, formData)
+        const { data } = await axios.post(`/auth/signup`, formData)
         console.log(data);
         if (data.message === 'success') {
           toast.success('the account is created successfly', {

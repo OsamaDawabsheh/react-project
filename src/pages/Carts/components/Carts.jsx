@@ -1,11 +1,10 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { toast, Bounce } from "react-toastify";
+import { Link } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
+import { CartContext } from "../../../context/Cart";
 import UseCarts from "../../../hooks/UseCarts";
 import * as styles from "./Carts.module.css";
-import { CartContext } from "../../../context/Cart";
 
 
 function Carts() {
@@ -22,7 +21,7 @@ function Carts() {
     setIsLoadingQuantity(true);
     try {
       const { data } = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/cart/incraseQuantity`,
+        `/cart/incraseQuantity`,
         { productId: id },
         {
           headers: {
@@ -70,7 +69,7 @@ function Carts() {
     setIsLoadingQuantity(true);
     try {
       const { data } = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/cart/decraseQuantity`,
+        `/cart/decraseQuantity`,
         { productId: id },
         {
           headers: {
@@ -116,7 +115,7 @@ function Carts() {
     setIsRemoving(true);
     try {
       const { data } = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/cart/removeItem`,
+        `/cart/removeItem`,
         { productId: id },
         {
           headers: {
@@ -162,7 +161,7 @@ function Carts() {
     setIsClearinging(true);
     try {
       const { data } = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/cart/clear`,
+        `/cart/clear`,
         {},
         {
           headers: {
