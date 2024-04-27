@@ -11,7 +11,6 @@ function UseCarts() {
 
      const getProducts = async () => {
        setIsLoading(true);
-             {console.log('os')}
 
     try {
       const { data } = await axios.get(

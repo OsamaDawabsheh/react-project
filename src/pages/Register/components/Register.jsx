@@ -5,7 +5,7 @@ import { toast,Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import * as styles from "./Register.module.css";
 import { Navigate, useNavigate } from "react-router-dom";
-import userImage from "../../../../public/userImage.png"
+import userImage from "../../../assets/userImage.png"
 
 function Register() {
 

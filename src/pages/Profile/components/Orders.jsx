@@ -24,7 +24,6 @@ function Orders() {
         }
       );
         setOrders(data.orders);
-          console.log(data.orders);
       data.orders.map((order) =>
           order.products.map((product) => products.push(product))
       );
