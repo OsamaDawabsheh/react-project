@@ -1,7 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import * as styles from "./Information.module.css";
 
 function Information() {
@@ -14,7 +12,7 @@ function Information() {
     setIsLoading(true);
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/user/profile`,
+        `/user/profile`,
         {
           headers: {
             Authorization: `Tariq__${token}`,

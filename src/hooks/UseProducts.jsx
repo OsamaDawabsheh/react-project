@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 function UseProducts(sort = "" , minPrice = "" , maxPrice = "" , search = "" , page = 1 , limit = 4  ) {
   const [errors, setErrors] = useState(false);
@@ -17,13 +17,13 @@ function UseProducts(sort = "" , minPrice = "" , maxPrice = "" , search = "" , p
     try {
       if (sort || minPrice || maxPrice || search) {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/products?sort=${sort}&search=${search}`
+          `/products?sort=${sort}&search=${search}`
         );
         setProducts(data.products);
         numberOfProducts = data.total;
       } else {
         const { data } = await axios.get(
-          `${import.meta.env.VITE_API_URL}/products?page=${page}&limit=${limit}`
+          `/products?page=${page}&limit=${limit}`
           );
         setProducts(data.products);
         numberOfProducts = data.total;

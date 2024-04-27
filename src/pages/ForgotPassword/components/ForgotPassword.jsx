@@ -1,9 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 import { object, string } from "yup";
-import { toast, Bounce } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
 import * as styles from "./ForgotPassword.module.css";
 
 function ForgotPassword() {
@@ -45,7 +44,7 @@ function ForgotPassword() {
       setIsLoading(true);
       try {
         const { data } = await axios.patch(
-          `${import.meta.env.VITE_API_URL}/auth/forgotPassword`,
+          `/auth/forgotPassword`,
           user
         );
         console.log(data);

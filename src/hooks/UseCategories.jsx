@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 function UseCategories() {
     const [errors, setErrors] = useState(false);
@@ -11,7 +11,7 @@ const getCategories = async () => {
         
     setIsLoading(true);
     try { 
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/categories/active?limit=9`);
+      const { data } = await axios.get(`/categories/active?limit=9`);
         setCategories(data.categories);
     }
     catch(error){

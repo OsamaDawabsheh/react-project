@@ -1,7 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import * as styles from "./Orders.module.css";
 
 function Orders() {
@@ -16,7 +14,7 @@ function Orders() {
     let products = [];
     try {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/order`,
+        `/order`,
         {
           headers: {
             Authorization: `Tariq__${token}`,

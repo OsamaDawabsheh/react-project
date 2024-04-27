@@ -1,10 +1,9 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useEffect } from "react";
-import { object, string } from "yup";
-import { toast, Bounce } from "react-toastify";
-import * as styles from "./Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
+import { object, string } from "yup";
+import * as styles from "./Login.module.css";
 
 function Login() {
   const [user, setUser] = useState({
@@ -44,7 +43,7 @@ function Login() {
       setIsLoading(true);
       try {
         const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL}/auth/signin`,
+          `/auth/signin`,
           user
         );
         if (data.message === "success") {

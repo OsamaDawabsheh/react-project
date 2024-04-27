@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 function UseSubCategory() {
@@ -13,7 +13,7 @@ const getSubCategories = async () => {
         
     setIsLoading(true);
     try { 
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/categories/${id}/subcategory`);
+      const { data } = await axios.get(`/categories/${id}/subcategory`);
         setSubCategory(data.subcategory);
         console.log(data);
     }

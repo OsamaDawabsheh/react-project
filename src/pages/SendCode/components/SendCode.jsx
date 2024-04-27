@@ -1,10 +1,9 @@
-import React from 'react'
 import axios from 'axios';
-import { useState } from 'react'
-import { object, string } from "yup";
-import { toast, Bounce } from "react-toastify";
-import * as styles from './SendCode.module.css'
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Bounce, toast } from "react-toastify";
+import { string } from "yup";
+import * as styles from './SendCode.module.css';
 
 function SendCode() {
   const [email, setEmail] = useState('');
@@ -44,7 +43,7 @@ function SendCode() {
     if (isValid) {
       setIsLoading(true);
       try {
-        const { data } = await axios.patch(`${import.meta.env.VITE_API_URL}/auth/sendcode`, {email})
+        const { data } = await axios.patch(`/auth/sendcode`, {email})
         if (data.message === "success") {
           localStorage.setItem('email', email);
           toast.success("the code send successfly", {

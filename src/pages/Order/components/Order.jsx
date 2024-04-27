@@ -1,16 +1,15 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { useEffect } from "react";
-import { object, string } from "yup";
-import { toast, Bounce } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Scrollbar } from "swiper/modules";
+import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/scrollbar";
-import * as styles from "./Order.module.css";
+import { Navigation, Pagination, Scrollbar } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { object, string } from "yup";
 import UseCarts from "../../../hooks/UseCarts";
+import * as styles from "./Order.module.css";
 
 function Order() {
   const [order, setOrder] = useState({
@@ -55,7 +54,7 @@ function Order() {
       setOrderIsLoading(true);
       try {
         const { data } = await axios.post(
-          `${import.meta.env.VITE_API_URL}/order`,
+          `/order`,
           order ,
         {
           headers: {
