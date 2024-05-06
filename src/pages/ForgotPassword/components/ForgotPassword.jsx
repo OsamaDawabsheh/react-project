@@ -1,19 +1,24 @@
 import axios from "axios";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import { object, string } from "yup";
+import useErrorContext from "../../../hooks/UseErrors";
+import useLoadingContext from "../../../hooks/UseLoading";
+import asyncHandler from "../../../utils/asyncHandler";
 import * as styles from "./ForgotPassword.module.css";
 
 function ForgotPassword() {
   const [user, setUser] = useState({
-    email: localStorage.getItem('email'),
+    email: localStorage.getItem("email"),
     code: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const { loading, withLoading } = useLoadingContext();
+  const { error, withError } = useErrorContext();
+  const [forgotError, setForgotError] = useState([]);
   const navigate = useNavigate();
 
   const dataValidation = async () => {
@@ -23,10 +28,10 @@ function ForgotPassword() {
     });
     try {
       await userSchema.validate(user, await { abortEarly: false });
-      setErrors([]);
+      setForgotError([]);
       return true;
     } catch (error) {
-      setErrors(error.errors);
+      setForgotError(error.errors);
       return false;
     }
   };
@@ -41,48 +46,27 @@ function ForgotPassword() {
     const isValid = await dataValidation();
     console.log(user);
     if (isValid) {
-      setIsLoading(true);
-      try {
-        const { data } = await axios.patch(
-          `/auth/forgotPassword`,
-          user
-        );
-        console.log(data);
-        if (data.message === "success") {
-          toast.success("the password changed successfly", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
-          localStorage.removeItem("email");
-          localStorage.removeItem("changePassword");
-          navigate("/login");
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error(error.response.data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      withLoading(
+        asyncHandler(
+          async () => {
+            const { data } = await axios.patch(`/auth/forgotPassword`, user);
+            if (data.message === "success") {
+              toast.success("the password changed successfly");
+              localStorage.removeItem("email");
+              localStorage.removeItem("changePassword");
+              navigate("/login");
+            }
+          },
+          withError,
+          "forgotPassword"
+        ),
+        "forgotPassword"
+      );
+    }
+    if (error.forgotPassword) {
+      toast.error(error.forgotPassword);
     }
   };
-
 
   return (
     <div
@@ -111,12 +95,12 @@ function ForgotPassword() {
         <div className="d-flex flex-column gap-4">
           <ul
             className={
-              errors.length !== 0
+              forgotError.length !== 0
                 ? "bg-danger py-2 m-0 fw-bold rounded-5"
                 : "d-none"
             }
           >
-            {errors.map((error, index) => (
+            {forgotError.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
           </ul>
@@ -139,51 +123,51 @@ function ForgotPassword() {
               New Password
             </label>
             <div className="position-relative">
-            <input
-              type={showPassword ? "password" : "text"}
-              value={user.password}
-              onChange={handleUserChange}
-              name="password"
-              id="password"
-              className="py-2 px-3 rounded-5 border-0 w-100"
-              placeholder="Enter New Password"
-            />
-            {showPassword ? (
-              <svg
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                className={styles.eyeIcon}
-                onClick={() => setShowPassword(false)}
-              >
-                <title>hide password</title>
-                <path d="M12.81 4.36l-1.77 1.78c-0.311-0.087-0.668-0.137-1.037-0.137-2.209 0-4 1.791-4 4 0 0.369 0.050 0.726 0.143 1.065l-0.007-0.028-2.76 2.75c-1.32-1-2.42-2.3-3.18-3.79 1.86-3.591 5.548-6.003 9.799-6.003 0.996 0 1.96 0.132 2.878 0.38l-0.077-0.018zM16.61 6.21c1.33 1 2.43 2.3 3.2 3.79-1.859 3.594-5.549 6.007-9.802 6.007-1.002 0-1.973-0.134-2.895-0.385l0.077 0.018 1.77-1.78c0.311 0.087 0.668 0.137 1.037 0.137 2.209 0 4-1.791 4-4 0-0.369-0.050-0.726-0.143-1.065l0.007 0.028 2.76-2.75zM16.36 2.22l1.42 1.42-14.14 14.14-1.42-1.42 14.14-14.14z"></path>
-              </svg>
-            ) : (
-              <svg
-                version="1.1"
-                xmlns="http://www.w3.org/2000/svg"
-                width={20}
-                height={20}
-                viewBox="0 0 20 20"
-                className={styles.eyeIcon}
-                onClick={() => setShowPassword(true)}
-              >
-                <title>show password</title>
-                <path d="M0.2 10c1.86-3.592 5.548-6.004 9.8-6.004s7.94 2.412 9.771 5.943l0.029 0.061c-1.86 3.592-5.548 6.004-9.8 6.004s-7.94-2.412-9.771-5.943l-0.029-0.061zM10 14c2.209 0 4-1.791 4-4s-1.791-4-4-4v0c-2.209 0-4 1.791-4 4s1.791 4 4 4v0zM10 12c-1.105 0-2-0.895-2-2s0.895-2 2-2v0c1.105 0 2 0.895 2 2s-0.895 2-2 2v0z" />
-              </svg>
+              <input
+                type={showPassword ? "password" : "text"}
+                value={user.password}
+                onChange={handleUserChange}
+                name="password"
+                id="password"
+                className="py-2 px-3 rounded-5 border-0 w-100"
+                placeholder="Enter New Password"
+              />
+              {showPassword ? (
+                <svg
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  className={styles.eyeIcon}
+                  onClick={() => setShowPassword(false)}
+                >
+                  <title>hide password</title>
+                  <path d="M12.81 4.36l-1.77 1.78c-0.311-0.087-0.668-0.137-1.037-0.137-2.209 0-4 1.791-4 4 0 0.369 0.050 0.726 0.143 1.065l-0.007-0.028-2.76 2.75c-1.32-1-2.42-2.3-3.18-3.79 1.86-3.591 5.548-6.003 9.799-6.003 0.996 0 1.96 0.132 2.878 0.38l-0.077-0.018zM16.61 6.21c1.33 1 2.43 2.3 3.2 3.79-1.859 3.594-5.549 6.007-9.802 6.007-1.002 0-1.973-0.134-2.895-0.385l0.077 0.018 1.77-1.78c0.311 0.087 0.668 0.137 1.037 0.137 2.209 0 4-1.791 4-4 0-0.369-0.050-0.726-0.143-1.065l0.007 0.028 2.76-2.75zM16.36 2.22l1.42 1.42-14.14 14.14-1.42-1.42 14.14-14.14z"></path>
+                </svg>
+              ) : (
+                <svg
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={20}
+                  height={20}
+                  viewBox="0 0 20 20"
+                  className={styles.eyeIcon}
+                  onClick={() => setShowPassword(true)}
+                >
+                  <title>show password</title>
+                  <path d="M0.2 10c1.86-3.592 5.548-6.004 9.8-6.004s7.94 2.412 9.771 5.943l0.029 0.061c-1.86 3.592-5.548 6.004-9.8 6.004s-7.94-2.412-9.771-5.943l-0.029-0.061zM10 14c2.209 0 4-1.791 4-4s-1.791-4-4-4v0c-2.209 0-4 1.791-4 4s1.791 4 4 4v0zM10 12c-1.105 0-2-0.895-2-2s0.895-2 2-2v0c1.105 0 2 0.895 2 2s-0.895 2-2 2v0z" />
+                </svg>
               )}
-              </div>
+            </div>
           </div>
         </div>
         <button
           type="submit"
           className="border-0 rounded-5 py-2 bg-warning fw-bold"
-          disabled={isLoading ?? "disabled"}
+          disabled={loading.forgotPassword ? "disabled" : ""}
         >
-          {isLoading ? (
+          {loading.forgotPassword ? (
             <div className="spinner-border" role="status"></div>
           ) : (
             "Send"

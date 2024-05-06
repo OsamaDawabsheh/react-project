@@ -2,251 +2,38 @@ import axios from "axios";
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
-import { CartContext } from "../../../context/Cart";
-import UseCarts from "../../../hooks/UseCarts";
+import useLoadingContext  from "../../../hooks/UseLoading";
+import useCartContext from "../../../hooks/UseCarts";
 import * as styles from "./Carts.module.css";
-
+import useErrorContext from "../../../hooks/UseErrors";
 
 function Carts() {
-  const [isLoadingQuantity, setIsLoadingQuantity] = useState(false);
-  const [isClearing, setIsClearinging] = useState(false);
-  const [isRemoving, setIsRemoving] = useState(false);
-  const [cartProducts, setCartProducts] = useState({});
+  const { cart, increaseQty, decreaseQty, removeItem, clearCart } =
+    useCartContext();
+  const { loading } = useLoadingContext();
+  const { error } = useErrorContext();
 
-  const { products, isLoading, errors, token, getProducts} = UseCarts();
-    const {count , updateCount} = useContext(CartContext);
-
-
-  const increaseQuantity = async (id) => {
-    setIsLoadingQuantity(true);
-    try {
-      const { data } = await axios.patch(
-        `/cart/incraseQuantity`,
-        { productId: id },
-        {
-          headers: {
-            Authorization: `Tariq__${token}`,
-          },
-        }
-      );
-      if (data.message === "success") {
-        toast.success("product's count increased successfully", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        const result = data.cart.products;
-                  setCartProducts({
-                   result
-        })
-      }
-    } catch (error) {
-      toast.error("error when trying update product's count", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-      setIsLoadingQuantity(false);
-
-
+    if (error.getCart) {
+      return error.getCart;
     }
-  };
 
-  const decreaseQuantity = async (id) => {
-    setIsLoadingQuantity(true);
-    try {
-      const { data } = await axios.patch(
-        `/cart/decraseQuantity`,
-        { productId: id },
-        {
-          headers: {
-            Authorization: `Tariq__${token}`,
-          },
-        }
-      );
-      if (data.message === "success") {
-        toast.success("product's count decreased successfully", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-                const result = data.cart.products;
-                  setCartProducts({
-                   result
-        })
-      }
-    } catch (error) {
-      toast.error(error.response.data.message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-      setIsLoadingQuantity(false);
+    if (loading.getCart) {
+      return loading.getCart;
     }
-  };
-
-  const removeProduct = async (id) => {
-    setIsRemoving(true);
-    try {
-      const { data } = await axios.patch(
-        `/cart/removeItem`,
-        { productId: id },
-        {
-          headers: {
-            Authorization: `Tariq__${token}`,
-          },
-        }
-      );
-      if (data.message === "success") {
-        toast.success("product removed successfly", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        updateCount(count - 1);
-        getProducts();
-
-
-      }
-    } catch (error) {
-      toast.error("error when trying remove product", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-      setIsRemoving(false);
-    }
-  };
-
-  const clearCart = async () => {
-    setIsClearinging(true);
-    try {
-      const { data } = await axios.patch(
-        `/cart/clear`,
-        {},
-        {
-          headers: {
-            Authorization: `Tariq__${token}`,
-          },
-        }
-      );
-      if (data.message === "success") {
-        toast.success("cart cleared successfully", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        updateCount(0);
-        getProducts();
-
-
-      }
-    } catch (error) {
-      toast.error(error.response.data.message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-      setIsClearinging(false);
-    }
-  };
+ 
 
   return (
     <div className="container main d-flex flex-column gap-3">
       <h1 className="text-center">Cart</h1>
-      {isLoading ? (
-        <div
-          className={
-            "p-5 m-4 d-flex align-items-center justify-content-center flex-column gap-3 main"
-          }
-        >
-          <div className={`spinner-border`} role="status"></div>
-          <span className="sr-only fs-5 fw-bold">Loading...</span>
-        </div>
-      ) : errors ? (
-        <div className="py-5  main">
-          <div className="d-flex gap-3 justify-content-center align-items-center text-danger">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="100px"
-              height="100px"
-              viewBox="0 0 24 24"
-            >
-              <path
-                className={styles.errorIcon}
-                fill="currentColor"
-                d="M11.001 10h2v5h-2zM11 16h2v2h-2z"
-              />
-              <path
-                className={styles.errorIcon}
-                fill="currentColor"
-                d="M13.768 4.2C13.42 3.545 12.742 3.138 12 3.138s-1.42.407-1.768 1.063L2.894 18.064a1.986 1.986 0 0 0 .054 1.968A1.984 1.984 0 0 0 4.661 21h14.678c.708 0 1.349-.362 1.714-.968a1.989 1.989 0 0 0 .054-1.968L13.768 4.2zM4.661 19L12 5.137L19.344 19H4.661z"
-              />
-            </svg>
-            <h1>Error happened when trying to get data</h1>
-          </div>
-        </div>
-      ) : products.length ? (
-            <>
+     { cart.length ? (
+        <>
           <div className="d-flex justify-content-between gap-3">
             <button
               className="border border-0 text-light fw-bold bg-danger px-3 py-2 rounded-5"
               onClick={clearCart}
-              disabled={isClearing ? "disabled" : ""}
+              disabled={loading.clear ? "disabled" : ""}
             >
-              {isClearing ? (
+              {loading.clear ? (
                 <div
                   className={`spinner-border ${styles.loader}`}
                   role="status"
@@ -273,15 +60,15 @@ function Carts() {
               </tr>
             </thead>
             <tbody className="fw-bold">
-              {products.map((product) => (
-                <tr key={product.productId}>
+              {cart.map((item) => (
+                <tr key={item.productId}>
                   <td className="col-1 align-middle">
                     <button
                       className="border-0 bg-transparent"
-                      onClick={() => removeProduct(product.productId)}
-                      disabled={isRemoving ? "disabled" : ""}
+                      onClick={() => removeItem(item.productId)}
+                      disabled={loading.remove ? "disabled" : ""}
                     >
-                      {isRemoving ? (
+                      {loading.remove ? (
                         <div
                           className={`spinner-border ${styles.loader}`}
                           role="status"
@@ -304,7 +91,7 @@ function Carts() {
                   </td>
                   <td className="col-4 align-middle">
                     <img
-                      src={product.details.mainImage.secure_url}
+                      src={item.details.mainImage.secure_url}
                       className={styles.productImage}
                       alt=""
                     />
@@ -314,14 +101,14 @@ function Carts() {
                       type="submit"
                       className="border-0 rounded-5 px-2 bg-warning fw-bold"
                       disabled={
-                        isLoadingQuantity || product.quantity === 1
+                        loading.quantity || item.quantity === 1
                           ? "disabled"
                           : ""
                       }
-                      onClick={() => decreaseQuantity(product.productId)}
+                      onClick={() => decreaseQty(item.productId)}
                     >
                       {" "}
-                      {isLoadingQuantity ? (
+                      {loading.quantity ? (
                         <div
                           className={`spinner-border bg-warning ${styles.loader}`}
                           role="status"
@@ -330,15 +117,21 @@ function Carts() {
                         "-"
                       )}{" "}
                     </button>
-                    <span className="mx-2">{ cartProducts.result  && (cartProducts.result.filter((res) => product.productId === res.productId)) ? cartProducts.result.filter((res) => product.productId === res.productId)[0].quantity :  product.quantity}</span>
+                    <span className="mx-2">
+                      {
+                        cart.filter(
+                          (res) => item.productId === res.productId
+                        )[0].quantity
+                      }
+                    </span>
                     <button
                       type="submit"
                       className="border-0 rounded-5 px-2 bg-warning fw-bold"
-                      disabled={isLoadingQuantity ? "disabled" : ""}
-                      onClick={() => increaseQuantity(product.productId)}
+                      disabled={loading.quantity ? "disabled" : ""}
+                      onClick={() => increaseQty(item.productId)}
                     >
                       {" "}
-                      {isLoadingQuantity ? (
+                      {loading.quantity ? (
                         <div
                           className={`spinner-border bg-warning ${styles.loader}`}
                           role="status"
@@ -349,10 +142,18 @@ function Carts() {
                     </button>
                   </td>
                   <td className="col-2 align-middle">
-                    {product.details.finalPrice}$
+                    {item.details.finalPrice}$
                   </td>
                   <td className="col-2 align-middle">
-                    {cartProducts.result  && (cartProducts.result.filter((res) => product.productId === res.productId)) ? cartProducts.result.filter((res) => product.productId === res.productId)[0].quantity * product.details.finalPrice : product.quantity * product.details.finalPrice}$
+                    {cart.filter((res) => item.productId === res.productId)[0]
+                      .details
+                      ? (
+                          cart.filter(
+                            (res) => item.productId === res.productId
+                          )[0].details.finalPrice * item.quantity
+                        ).toFixed(2)
+                      : item.details.finalPrice * item.quantity}
+                    $
                   </td>
                 </tr>
               ))}

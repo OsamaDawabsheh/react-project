@@ -7,7 +7,7 @@ function Profile() {
     <div className='container main'>
           <nav className='navbar navbar-expand-lg justify-content-center'>
               <ul className='navbar-nav d-flex flex-row gap-3 text-dark'>
-                  <li className='nav-item'>
+          <li className='nav-item'>
                                     <NavLink className={`px-2 py-1 bg-primary nav-link`} to='orders'>orders</NavLink>
 
                   </li>

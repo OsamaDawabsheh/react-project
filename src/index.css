@@ -35,3 +35,11 @@ input:focus{
   -o-border-radius: 50%;
 }
 
+.errorIcon{
+    fill: danger;
+}
+
+.loader{
+    width: 4rem;
+    height: 4rem;
+}

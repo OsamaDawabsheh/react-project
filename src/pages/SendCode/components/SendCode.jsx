@@ -1,86 +1,62 @@
-import axios from 'axios';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import React, { useState } from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import { string } from "yup";
-import * as styles from './SendCode.module.css';
+import useErrorContext from "../../../hooks/UseErrors";
+import useLoadingContext from "../../../hooks/UseLoading";
+import asyncHandler from "../../../utils/asyncHandler";
+import * as styles from "./SendCode.module.css";
 
 function SendCode() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const { loading, withLoading } = useLoadingContext();
+  const { error, withError } = useErrorContext();
   const navigate = useNavigate();
 
-  const handleEmailChange = (e) => { 
+  const handleEmailChange = (e) => {
     setEmail(e.target.value);
-  }
+  };
 
   const dataValidation = async () => {
-    
     let emailSchema = string().email().required();
     try {
       await emailSchema.validate(email, await { abortEarly: true });
       return true;
     } catch (error) {
-        toast.error('please enter your email', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+      toast.error("please enter your email");
       return false;
     }
-  };  
-
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isValid = await dataValidation();
     if (isValid) {
-      setIsLoading(true);
-      try {
-        const { data } = await axios.patch(`/auth/sendcode`, {email})
-        if (data.message === "success") {
-          localStorage.setItem('email', email);
-          toast.success("the code send successfly", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
-          navigate("/forgotPassword");
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error('error when trying send code', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      withLoading(
+        asyncHandler(
+          async () => {
+            const { data } = await axios.patch(`/auth/sendcode`, { email });
+            if (data.message === "success") {
+              localStorage.setItem("email", email);
+              toast.success("the code send successfly");
+              navigate("/forgotPassword");
+            }
+          },
+          withError,
+          "sendCode"
+        ),
+        "sendCode"
+      );
     }
-  
-  }
+    if (error.sendCode) {
+      toast.error(error.sendCode);
+    }
+  };
 
   return (
- <div
+    <div
       className={`container row mx-auto justify-content-center align-items-center h-100 ${styles.yMargin}`}
     >
       <form
@@ -101,7 +77,7 @@ function SendCode() {
         </svg>
 
         <div className="text-center">
-          <h2 className='mt-3'>Send Code</h2>
+          <h2 className="mt-3">Send Code</h2>
         </div>
         <div className="d-flex flex-column gap-4">
           <div className="d-flex flex-column gap-2">
@@ -122,9 +98,9 @@ function SendCode() {
         <button
           type="submit"
           className="border-0 rounded-5 py-2 bg-warning fw-bold"
-          disabled={isLoading ?? "disabled"}
+          disabled={loading.sendCode ? "disabled" : ""}
         >
-          {isLoading ? (
+          {loading.sendCode ? (
             <div className="spinner-border" role="status"></div>
           ) : (
             "Send"
@@ -132,7 +108,7 @@ function SendCode() {
         </button>
       </form>
     </div>
-  )
+  );
 }
 
-export default SendCode
+export default SendCode;

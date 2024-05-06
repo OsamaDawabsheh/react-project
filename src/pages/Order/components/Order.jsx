@@ -9,6 +9,9 @@ import { Navigation, Pagination, Scrollbar } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { object, string } from "yup";
 import UseCarts from "../../../hooks/UseCarts";
+import useErrorContext from "../../../hooks/UseErrors";
+import useLoadingContext from "../../../hooks/UseLoading";
+import asyncHandler from "../../../utils/asyncHandler";
 import * as styles from "./Order.module.css";
 
 function Order() {
@@ -19,9 +22,11 @@ function Order() {
   });
   const navigate = useNavigate();
   const [orderErrors, setOrderErrors] = useState([]);
-  const [orderIsLoading, setOrderIsLoading] = useState(false)
-
-  const { products, isLoading, errors, token } = UseCarts();
+  const [orderIsLoading, setOrderIsLoading] = useState(false);
+  const { loading, withLoading } = useLoadingContext();
+  const { error, withError } = useErrorContext();
+  const { cart, getCart } = UseCarts();
+  const token = localStorage.getItem("userToken");
 
   const dataValidation = async () => {
     let orderSchema = object({
@@ -36,8 +41,6 @@ function Order() {
     } catch (error) {
       setOrderErrors(error.errors);
       return false;
-    } finally { 
-      console.log(orderErrors)
     }
   };
 
@@ -49,162 +52,134 @@ function Order() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const isValid = await dataValidation();
-    console.log(order);
+    setOrderIsLoading(true);
     if (isValid) {
-      setOrderIsLoading(true);
-      try {
-        const { data } = await axios.post(
-          `/order`,
-          order ,
-        {
-          headers: {
-            Authorization: `Tariq__${token}`,
+      withLoading(
+        asyncHandler(
+          async () => {
+            const { data } = await axios.post(`/order`, order, {
+              headers: {
+                Authorization: `Tariq__${token}`,
+              },
+            });
+            if (data.message === "success") {
+              toast.success("order send successfly");
+              getCart();
+              navigate("/profile");
+            }
           },
-        }
-        
-        );
-        console.log(data);
-        if (data.message === "success") {
-          toast.success("order send successfly", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-            transition: Bounce,
-          });
-          navigate('/profile');
-        }
-      } catch (error) {
-        console.log(error);
-        toast.error('error when trying send order', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-      } finally {
-        setOrderIsLoading(false);
-      }
+          withError,
+          "submitOrder"
+        ),
+        "submitOrder"
+      );
+    }
+    setOrderIsLoading(false);
+    if (error.submitOrder) {
+      toast.error(
+        error.submitOrder.props.children.props.children[1].props.children
+      );
     }
   };
 
   return (
     <div className="container ">
       <div className="row justify-content-between gy-5 ">
-              <div className="col-xl-8 col-lg-7 col-md-6">
-                  
-                  <div className="bg-warning rounded-5 h-100 d-flex align-items-center">
-                                               
-            {isLoading ? (
-              <div className="w-100 m-4 d-flex align-items-center flex-column gap-3">
-                <div
-                  className={`spinner-border ${styles.loader}`}
-                  role="status"
-                ></div>
-                <span className="sr-only fs-5 fw-bold">Loading...</span>
+        <div className="col-xl-8 col-lg-7 col-md-6">
+          {loading.getCart ? (
+            loading.getCart
+          ) : error.getCart ? (
+            <div className="py-5  main">
+              <div className="d-flex gap-3 justify-content-center align-items-center text-danger">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="100px"
+                  height="100px"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    className="errorIcon"
+                    fill="currentColor"
+                    d="M11.001 10h2v5h-2zM11 16h2v2h-2z"
+                  />
+                  <path
+                    className="errorIcon"
+                    fill="currentColor"
+                    d="M13.768 4.2C13.42 3.545 12.742 3.138 12 3.138s-1.42.407-1.768 1.063L2.894 18.064a1.986 1.986 0 0 0 .054 1.968A1.984 1.984 0 0 0 4.661 21h14.678c.708 0 1.349-.362 1.714-.968a1.989 1.989 0 0 0 .054-1.968L13.768 4.2zM4.661 19L12 5.137L19.344 19H4.661z"
+                  />
+                </svg>
+                <h1>error when trying get Cart</h1>
               </div>
-            ) : errors ? (
-              <div>
-                <div className="d-flex gap-3 justify-content-center align-items-center text-danger p-5">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="100px"
-                    height="100px"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      className={styles.errorIcon}
-                      fill="currentColor"
-                      d="M11.001 10h2v5h-2zM11 16h2v2h-2z"
-                    />
-                    <path
-                      className={styles.errorIcon}
-                      fill="currentColor"
-                      d="M13.768 4.2C13.42 3.545 12.742 3.138 12 3.138s-1.42.407-1.768 1.063L2.894 18.064a1.986 1.986 0 0 0 .054 1.968A1.984 1.984 0 0 0 4.661 21h14.678c.708 0 1.349-.362 1.714-.968a1.989 1.989 0 0 0 .054-1.968L13.768 4.2zM4.661 19L12 5.137L19.344 19H4.661z"
-                    />
-                  </svg>
-                  <h1>Error happened when trying to get data</h1>
-                </div>
-              </div>
+            </div>
+          ) : (
+            <div className="bg-warning rounded-5 h-100 d-flex align-items-center">
+              {cart ? (
+                <Swiper
+                  modules={[Navigation, Pagination, Scrollbar]}
+                  speed={1000}
+                  navigation
+                  className={` px-5 py-4 ${styles.swiperExtensions} w-100 h-50 bg-warning`}
+                  breakpoints={{
+                    0: {
+                      slidesPerView: 1,
+                      spaceBetween: 100,
+                    },
+                    320: {
+                      slidesPerView: 2,
+                      spaceBetween: 30,
+                    },
+                    360: {
+                      slidesPerView: 2,
+                      spaceBetween: 50,
+                    },
+                    500: {
+                      slidesPerView: 3,
+                      spaceBetween: 50,
+                    },
+                    770: {
+                      slidesPerView: 1,
+                      spaceBetween: 50,
+                    },
+                    990: {
+                      slidesPerView: 2,
+                      spaceBetween: 50,
+                    },
+                    1200: {
+                      slidesPerView: 3,
+                      spaceBetween: 50,
+                    },
+                  }}
+                >
+                  {cart.map((product) => (
+                    <SwiperSlide key={product.productId}>
+                      <span
+                        className={`bg-primary text-light rounded-5 px-1 fw-bold ${styles.price}`}
+                      >
+                        {product.details.price}$
+                      </span>
+                      <img
+                        className={`w-100 h-100 ${styles.productImage}`}
+                        src={product.details.mainImage.secure_url}
+                        alt="category image"
+                      />
+                      <span
+                        className={`bg-primary text-light rounded-5 px-2 fw-bold ${styles.quantity}`}
+                      >
+                        {product.quantity}
+                      </span>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               ) : (
-                  products.length ?
-                    <Swiper
-                modules={[Navigation, Pagination, Scrollbar]}
-                speed={1000}
-                      navigation
-                className={` px-5 py-4 ${styles.swiperExtensions} w-100 h-50 bg-warning`}
-                breakpoints={{
-                  0: {
-                    slidesPerView: 1,
-                    spaceBetween: 100,
-                  },
-                  320: {
-                    slidesPerView: 2,
-                    spaceBetween: 30,
-                  },
-                  360: {
-                    slidesPerView: 2,
-                    spaceBetween: 50,
-                  },
-                  500: {
-                    slidesPerView: 3,
-                    spaceBetween: 50,
-                  },
-                  770: {
-                    slidesPerView: 1,
-                    spaceBetween: 50,
-                  },
-                  990: {
-                    slidesPerView: 2,
-                    spaceBetween: 50,
-                  },
-                  1200: {
-                    slidesPerView: 3,
-                    spaceBetween: 50,
-                  },
-                }}
-                  >
-                      {
-                        products.map((product) => (
-                          <SwiperSlide
-                            key={product.productId}
-                          >
-                            <span
-                              className={`bg-primary text-light rounded-5 px-1 fw-bold ${styles.price}`}
-                            >
-                              {product.details.price}$
-                            </span>
-                            <img
-                              className={`w-100 h-100 ${styles.productImage}`}
-                              src={product.details.mainImage.secure_url}
-                              alt="category image"
-                            />
-                            <span
-                              className={`bg-primary text-light rounded-5 px-2 fw-bold ${styles.quantity}`}
-                            >
-                              {product.quantity}
-                            </span>
-                          </SwiperSlide>
-                        ))
-                      }
-                    </Swiper>
-                    : <h1 className="w-100 d-flex align-items-center justify-content-center">Empty Cart</h1>
-            )}
-    </div>
-    </div>
+                <h1 className="w-100 d-flex align-items-center justify-content-center">
+                  Empty Cart
+                </h1>
+              )}
+            </div>
+          )}
+        </div>
 
-        <div
-          className={` col-xl-4 col-lg-5 col-md-6`}
-        >
+        <div className={` col-xl-4 col-lg-5 col-md-6`}>
           <form
             className=" position-relative bg-primary text-light py-5 px-3 d-flex flex-column gap-5 rounded-5 "
             action=""
@@ -284,9 +259,9 @@ function Order() {
             <button
               type="submit"
               className="border-0 rounded-5 py-2 bg-warning fw-bold"
-              disabled={orderIsLoading ?? "disabled"}
+              disabled={loading.submitOrder ? "disabled" : ""}
             >
-              {orderIsLoading ? (
+              {loading.submitOrder ? (
                 <div className="spinner-border" role="status"></div>
               ) : (
                 "Send"
@@ -298,5 +273,4 @@ function Order() {
     </div>
   );
 }
-
 export default Order;

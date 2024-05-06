@@ -1,33 +1,34 @@
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import axios from "axios";
+import { useEffect, useState } from "react";
+import asyncHandler from "../utils/asyncHandler";
+import useErrorContext from "./UseErrors";
+import useLoadingContext from "./UseLoading";
 
 function UseCategories() {
-    const [errors, setErrors] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); 
-    const [categories, setCategories] = useState([]);
+  const { loading, withLoading } = useLoadingContext();
+  const { error, withError } = useErrorContext();
+  const [categories, setCategories] = useState([]);
 
-
-const getCategories = async () => {
-        
-    setIsLoading(true);
-    try { 
-      const { data } = await axios.get(`/categories/active?limit=9`);
-        setCategories(data.categories);
-    }
-    catch(error){
-        setErrors(true);
-    }
-    finally {
-      setIsLoading(false);
-    }
-  }
+  const getCategories = () =>
+    withLoading(
+      asyncHandler(
+        async () => {
+          const { data } = await axios.get(`/categories/active?limit=9`);
+          if (data.message == "success") {
+            setCategories(data.categories);
+          }
+        },
+        withError,
+        'getCategories'
+      ),
+      "getCategories"
+    );
 
   useEffect(() => {
     getCategories();
   }, []);
 
-
-  return {categories , isLoading , errors}
+  return { categories, loading, error };
 }
 
-export default UseCategories
+export default UseCategories;

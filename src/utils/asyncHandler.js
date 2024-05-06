@@ -5,7 +5,7 @@ export const asyncHandler = (fn) => {
         try {
             await fn(...args)
         } catch (error) {
-            toast.error(error.response.data.message || "Something went wrong")
+            toast.error(error.response?.data.message || "Something went wrong")
         }
     }
 }

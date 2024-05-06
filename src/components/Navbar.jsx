@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { useCartContext } from '../hooks/use-cart'
+import useCartContext from '../hooks/UseCarts'
+
 
 function Navbar() {
 	const token = localStorage.getItem('userToken')

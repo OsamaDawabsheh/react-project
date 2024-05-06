@@ -17,13 +17,14 @@ import Login from './pages/Login/components/Login'
 import Order from './pages/Order/components/Order'
 import ProductDetails from './pages/Products/components/ProductDetails'
 import Products from './pages/Products/components/Products'
+import Profile from './pages/Profile/components/Profile'
 import Information from './pages/Profile/components/Information'
 import Orders from './pages/Profile/components/Orders'
 import Register from './pages/Register/components/Register'
 import SendCode from './pages/SendCode/components/SendCode'
 import SubCategory from './pages/SubCategory/components/SubCategory'
-import AuthRoutes from './routes/AuthRoutes'
-import ProtectedRoutes from './routes/ProtectedRoutes'
+import AuthRoutes from './auth/AuthRoutes'
+import ProtectedRoutes from './auth/ProtectedRoutes'
 
 function App() {
 	const router = createBrowserRouter([
@@ -86,6 +87,7 @@ function App() {
 						},
 						{
 							path: 'profile',
+							element: <Profile/>,
 							children: [
 								{
 									index: true,
